@@ -15,7 +15,7 @@ int main(void)
 	/* ---------------- LOGGING ---------------- */
 
 	logger = log_create("tp0.log","sansi",true, LOG_LEVEL_TRACE);
-	log_info(logger,"Hola! Soy un log");
+	log_info(logger,"Hola! Soy un log \n");
 	log_destroy(logger);
 
 	// Usando el logger creado previamente
@@ -23,8 +23,23 @@ int main(void)
 
 
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
+	config = config_create("cliente.config");
+	if (config  == NULL ){
+		printf("Se esta creando el archivo cliente.config \n");
+		config = iniciar_config ();
+	}
 
-	config = iniciar_config();
+	else 
+		printf("Se accedio al config \n");
+
+	valor = config_get_string_value(config,"CLAVE");
+	puerto = config_get_long_value(config,"PUERTO");
+	ip = config_get_long_value(config,"IP");
+
+	logger = log_create("tp0.log","Puerto",true, LOG_LEVEL_TRACE);
+	log_info(logger,"Port: %d \n", puerto);
+	log_destroy(logger);
+	
 
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
@@ -71,15 +86,25 @@ t_config* iniciar_config(void)
 void leer_consola(t_log* logger)
 {
 	char* leido;
+	while (1){
+		// La primera te la dejo de yapa
+		leido = readline("> ");
 
-	// La primera te la dejo de yapa
-	leido = readline("> ");
+		// El resto, las vamos leyendo y logueando hasta recibir un string vacío
 
-	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
+		if (leido)
+			break;
 
+		logger = log_create("tp0.log","Puerto",true, LOG_LEVEL_TRACE);
+		log_info(logger,"%s", leido);
+		log_destroy(logger);
+	
+		// ¡No te olvides de liberar las lineas antes de regresar!
+		free(leido);
 
-	// ¡No te olvides de liberar las lineas antes de regresar!
+	}
 
+	printf("Terminaron los logs");
 }
 
 void paquete(int conexion)
